@@ -1,0 +1,15 @@
+Download NCBI Taxonomy data and save it to a MySQL database.
+
+The script uses local data (given a directory) or downloads them from NCBI FTP.
+The database is re-created from scratch (first dropped, the created) and then
+dump files from NCBI are loaded to it.
+
+Database permissions have to be set before using this script.
+
+Files:
+ncbi_taxonomy_to_sql.py: main script;
+create_tables.sql: demo SQL script that creates database tables;
+settings.py.template: a template for settings file.
+
+Depends on python-MySQLdb module.
+
