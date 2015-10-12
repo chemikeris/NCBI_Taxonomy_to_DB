@@ -22,6 +22,7 @@ import logging
 import shutil
 import zipfile
 import urllib2
+import contextlib
 try:
     import MySQLdb
 except ImportError, err:
@@ -55,7 +56,7 @@ def unzip_taxdump_files(directory):
     """Unzip file taxdmp.zip in given directory"""
     logging.info('Unzipping dump files in %s', directory)
     filename = os.path.join(directory, 'taxdmp.zip')
-    with zipfile.ZipFile(filename) as zf:
+    with contextlib.closing(zipfile.ZipFile(filename)) as zf:
         for fname in zf.namelist():
             zf.extract(fname, directory)
 
