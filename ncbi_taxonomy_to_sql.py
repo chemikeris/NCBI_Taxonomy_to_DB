@@ -23,6 +23,7 @@ import shutil
 import zipfile
 import urllib2
 import contextlib
+import time
 try:
     import MySQLdb
 except ImportError, err:
@@ -210,7 +211,8 @@ def ncbi_taxonomy_to_sql(
         db, directory, download_data_from_ncbi, cleanup_data_directory,
         **unused_kwargs):
     """Load newest NCBI taxonomy database from given dump files"""
-    logging.info('Starting loading NCBI Taxonomy data to database.')
+    logging.info('Loading NCBI Taxonomy data to database.')
+    logging.info('Starting at %s.', time.asctime())
     if download_data_from_ncbi or dump_files_do_not_exist_in(directory):
         dump_files_exist = download_taxdump_to(directory)
     else:
@@ -238,9 +240,10 @@ def ncbi_taxonomy_to_sql(
         shutil.rmtree(directory)
     if data_loaded_successfully:
         logging.info('Data loaded successfully.')
+        logging.info('Finished at %s.', time.asctime())
         return 0
     else:
-        logging.info('Data loading failed.')
+        logging.info('Data loading failed at %s.', time.asctime())
         return 1
 
 
@@ -315,7 +318,7 @@ def parse_options(arguments):
         return None
     # If data directory is not given, the downloading data to temporary dir.
     if data_directory is None:
-        logging.info(
+        logging.debug(
             'Data directory not given, downloading files from NCBI '\
             'to a temporary directory.')
         data_directory = tempfile.mkdtemp()
