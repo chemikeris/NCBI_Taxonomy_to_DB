@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#! /usr/bin/env python3
 """Load NCBI Taxonomy data from dump files to MySQL database.
 
 Usage:
@@ -21,12 +21,12 @@ import getopt
 import logging
 import shutil
 import zipfile
-import urllib2
+import urllib.request, urllib.error, urllib.parse
 import contextlib
 import time
 try:
     import MySQLdb
-except ImportError, err:
+except ImportError as err:
     sys.stderr.write(
         'This script depends on MySQLdb module, which was not found.')
     sys.exit(1)
@@ -39,13 +39,13 @@ def download_taxdump_to(directory):
     result_file_with_path = os.path.join(directory, filename)
     try:
         logging.info('Trying to download from %s', source_url)
-        connection_to_ncbi = urllib2.urlopen(source_url)
-    except urllib2.URLError, err:
+        connection_to_ncbi = urllib.request.urlopen(source_url)
+    except urllib.error.URLError as err:
         logging.error('Connecting to NCBI FTP failed: %s', err)
         logging.debug('Reason: %s', err.reason)
         return False
     else:
-        with open(result_file_with_path, 'w') as f:
+        with open(result_file_with_path, 'wb') as f:
             f.write(connection_to_ncbi.read())
         logging.info('Successfully...')
         connection_to_ncbi.close()
@@ -107,7 +107,9 @@ def prepare_database(db):
     connection_for_preparing_db.close()
 
     db_connection = MySQLdb.connect(
-        host=db['host'], user=db['user'], passwd=db['password'], db=db['name'])
+        host=db['host'], user=db['user'], passwd=db['password'], db=db['name'],
+        local_infile=True
+        )
     logging.debug('Creating tables...')
     cursor = db_connection.cursor()
     cursor.execute("""
@@ -261,7 +263,7 @@ def parse_options(arguments):
     parsed_options['db'] = {}
     try:
         import settings
-    except ImportError, err:
+    except ImportError as err:
         logging.debug('settings.py not imported: %s', err)
         parsed_options['db']['name'] = 'ncbi_taxonomy'
         parsed_options['db']['host'] = 'localhost'
@@ -273,7 +275,7 @@ def parse_options(arguments):
             parsed_options['db']['host'] = settings.db_host
             parsed_options['db']['user'] = settings.db_user
             parsed_options['db']['password'] = settings.db_password
-        except AttributeError, err:
+        except AttributeError as err:
             sys.stderr.write(
                 'Incorrect settings in file settings.py: %s\n' % err)
             return None
@@ -287,14 +289,14 @@ def parse_options(arguments):
             ['help', 'debug', 'db=', 'host=', 'user=', 'password=',
              'directory=', 'download']
             )
-    except getopt.GetoptError, err:
+    except getopt.GetoptError as err:
         sys.stderr.write(
             'ERROR: getting command line options failed: %s' % err)
         return None
     else:
         for opt, arg in options:
             if opt in ('-h', '--help'):
-                print __doc__
+                print(__doc__)
                 return None
             elif opt == '--db':
                 parsed_options['db']['name'] = arg
