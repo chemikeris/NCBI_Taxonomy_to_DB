@@ -35,7 +35,7 @@ except ImportError as err:
 def download_taxdump_to(directory):
     """Retrieve taxdump files from NCBI FTP"""
     filename = 'taxdmp.zip'
-    source_url = 'ftp://ftp.ncbi.nlm.nih.gov/pub/taxonomy/%s' % filename
+    source_url = 'https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/%s' % filename
     result_file_with_path = os.path.join(directory, filename)
     try:
         logging.info('Trying to download from %s', source_url)
